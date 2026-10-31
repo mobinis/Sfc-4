@@ -1,0 +1,8 @@
+{
+  "firestore": [
+    {
+      "database": "ai-studio-android-selfcare-00c4a5af-2578-429f-8e51-f015bb8a8ffd",
+      "rules": "firestore.rules"
+    }
+  ]
+}

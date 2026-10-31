@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_background"
+    android:padding="12dp">
+
+    <!-- Header: App Name and Streak -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/widget_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="🌱 BloomQuest"
+            android:textColor="#F5F7F5"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/widget_streak"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🔥 3d Streak"
+            android:textColor="#E5A93C"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="6dp"
+        android:background="#34423C"
+        android:contentDescription="@null" />
+
+    <!-- Habit 1 Row -->
+    <LinearLayout
+        android:id="@+id/widget_habit_row_1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/widget_habit_title_1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="💧 Drink water"
+            android:textColor="#B8C8BF"
+            android:textSize="13sp" />
+
+        <ImageButton
+            android:id="@+id/widget_habit_check_1"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/widget_check_bg"
+            android:src="@android:drawable/checkbox_off_background"
+            android:contentDescription="Check habit 1" />
+    </LinearLayout>
+
+    <!-- Habit 2 Row -->
+    <LinearLayout
+        android:id="@+id/widget_habit_row_2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/widget_habit_title_2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="🧘 Morning Movement"
+            android:textColor="#B8C8BF"
+            android:textSize="13sp" />
+
+        <ImageButton
+            android:id="@+id/widget_habit_check_2"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/widget_check_bg"
+            android:src="@android:drawable/checkbox_off_background"
+            android:contentDescription="Check habit 2" />
+    </LinearLayout>
+
+    <!-- Habit 3 Row -->
+    <LinearLayout
+        android:id="@+id/widget_habit_row_3"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/widget_habit_title_3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="📖 Read 10 pages"
+            android:textColor="#B8C8BF"
+            android:textSize="13sp" />
+
+        <ImageButton
+            android:id="@+id/widget_habit_check_3"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/widget_check_bg"
+            android:src="@android:drawable/checkbox_off_background"
+            android:contentDescription="Check habit 3" />
+    </LinearLayout>
+
+</LinearLayout>

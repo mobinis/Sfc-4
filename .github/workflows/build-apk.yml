@@ -1,0 +1,105 @@
+name: Build SelfCare Hero Hybrid Android APK
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    name: Build & Release Hybrid Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Set up Java JDK 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install npm Dependencies
+        run: npm ci
+
+      - name: Build Static Web Bundle
+        run: npm run build
+
+      - name: Sync Capacitor Android
+        run: npx cap sync android
+
+      - name: Inject Google Services JSON (if configured in Secrets)
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -n "$GOOGLE_SERVICES_JSON" ]; then
+            echo "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
+            echo "Successfully injected google-services.json from repository secret."
+          elif [ -f "app/google-services.json" ]; then
+            cp app/google-services.json android/app/google-services.json
+            echo "Used local app/google-services.json fallback."
+          else
+            echo "No google-services.json secret found. Proceeding with standard offline configuration."
+          fi
+
+      - name: Grant Execute Permissions to Gradle Wrapper
+        run: chmod +x android/gradlew
+
+      - name: Build Android Debug APK (Memory & Worker Capped)
+        env:
+          ORG_GRADLE_JVMARGS: "-Xmx4g -XX:+HeapDumpOnOutOfMemoryError"
+        run: |
+          cd android
+          ./gradlew assembleDebug -x test --no-daemon --max-workers=2 --console=plain
+
+      - name: Verify Compiled APK Artifact
+        id: verify_apk
+        run: |
+          APK_PATH="android/app/build/outputs/apk/debug/app-debug.apk"
+          if [ ! -s "$APK_PATH" ]; then
+            echo "FATAL: Output APK not found or empty at $APK_PATH"
+            exit 1
+          fi
+          
+          # Rename to clean deliverable name
+          cp "$APK_PATH" SelfCare-Hero-Hybrid.apk
+          sha256sum SelfCare-Hero-Hybrid.apk > SelfCare-Hero-Hybrid.apk.sha256
+          
+          echo "APK generated successfully. Size: $(du -h SelfCare-Hero-Hybrid.apk | cut -f1)"
+          echo "SHA256: $(cat SelfCare-Hero-Hybrid.apk.sha256)"
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: github.event_name == 'push'
+        with:
+          tag_name: "v1.0.${{ github.run_number }}"
+          name: "SelfCare Hero v1.0.${{ github.run_number }}"
+          draft: false
+          prerelease: false
+          body: |
+            ## 🌿 SelfCare Hero — Hybrid Offline PWA (Release v1.0.${{ github.run_number }})
+            
+            ### Architecture Highlights:
+            - **Offline-First Hybrid PWA + Ionic Capacitor:** Zero native JVM/Kotlin compilation bottlenecks or missing symbols.
+            - **Dual-Layer Hardware Persistence:** LocalStorage + non-evictable `@capacitor/filesystem` snapshot guard (`selfcare_hero_backup_ring.json`).
+            - **SM-2 Spaced Repetition:** Integrated Feynman teach-back cards with mathematical recall retention.
+            - **Sage Green Visual Sanctuary:** Built with Tailwind CSS, responsive mobile viewport, and somatic breath pacing (4-7-8 & box).
+            
+            ### Direct Downloads:
+            - `SelfCare-Hero-Hybrid.apk` (Android 8.0+ / API 26–35)
+            - `SelfCare-Hero-Hybrid.apk.sha256` (Integrity Checksum)
+          files: |
+            SelfCare-Hero-Hybrid.apk
+            SelfCare-Hero-Hybrid.apk.sha256

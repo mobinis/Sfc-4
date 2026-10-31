@@ -1,0 +1,6 @@
+{
+  "name": "BloomQuest",
+  "description": "Offline 8-bit mindful companion for habit mastery, deep focus, skill progression, and personal growth.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

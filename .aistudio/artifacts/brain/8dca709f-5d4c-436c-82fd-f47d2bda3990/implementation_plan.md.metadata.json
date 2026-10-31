@@ -1,0 +1,6 @@
+{
+  "summary":  "Design & UI overhaul plan introducing:\n1. Warm Cream & Pastel Blossom Palette (#FFF4DE, #FFDDDD, #FFCED8, #FFE8C4) with dual theme support (Soft Warm Cream light theme + Warm Velvet Espresso dark mode) and instant 1-tap toggle in HeaderBar.\n2. Clean Information Architecture & Visual Hierarchy: Reorganized Today screen with Hero Greeting, quick action chips, categorized routine pills (Morning, Afternoon, Evening, Flexible), and collapsible widgets for 90-Day Sprint & Anti-Goals.\n3. Supercharged AI Copilot with Tool Calling, Semantic Search, Behavioral Diagnostic Critique ('What am I doing wrong?'), What-To-Do-Next recommendations, and Android Text-to-Speech (TTS) voice playback.",
+  "updatedAt":  "2026-10-28T08:19:28.289633135Z",
+  "requestFeedback":  true,
+  "userFacing":  true
+}

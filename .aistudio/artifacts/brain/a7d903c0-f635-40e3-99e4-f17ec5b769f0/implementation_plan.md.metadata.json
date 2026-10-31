@@ -1,0 +1,6 @@
+{
+  "summary":  "Implementation plan for re-applying the Sage Sanctuary Palette and Button Styling to the native Android Jetpack Compose app:\n1. Harmonize Color.kt and Theme.kt with exact Sage Sanctuary color tokens for both Light and Dark themes.\n2. Standardize primary action buttons across all dialogs and screens to use Forest Sage (#2D6A4F in light / #3D7D62 in dark) with white text, 12dp rounded corners, and semi-bold typography.\n3. Configure all Floating Action Buttons (FABs) across screens to use Warm Amber (#E5A93C) with charcoal #121413 iconography and soft amber elevation shadow.\n4. Replace raw hardcoded orange/indigo colors across screens with semantic theme tokens.",
+  "updatedAt":  "2026-10-29T04:19:11.423444350Z",
+  "requestFeedback":  true,
+  "userFacing":  true
+}

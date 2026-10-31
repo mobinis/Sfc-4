@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+:root {
+  --color-sage-primary: #87A96B;
+  --color-sage-light: #F4F7F2;
+  --color-sage-dark: #4A6B35;
+  --color-surface-dark: #1E241B;
+  --color-surface-card: #252D22;
+  --color-surface-border: #33402E;
+  --color-text-main: #F4F7F2;
+  --color-text-muted: #859A90;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-surface-dark);
+    color: var(--color-text-main);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: contain;
+  }
+
+  body.light {
+    background-color: var(--color-sage-light);
+    color: #1C221E;
+  }
+}
+
+/* Sage Brand Accent Utilities */
+.bg-sage-primary {
+  background-color: #87A96B;
+}
+
+.text-sage-primary {
+  color: #87A96B;
+}
+
+.border-sage-primary {
+  border-color: #87A96B;
+}
+
+.bg-sage-dark {
+  background-color: #4A6B35;
+}
+
+.text-sage-dark {
+  color: #4A6B35;
+}
+
+.border-sage-dark {
+  border-color: #4A6B35;
+}
+
+.bg-surface-dark {
+  background-color: #1E241B;
+}
+
+.bg-surface-card {
+  background-color: #252D22;
+}
+
+.border-surface-border {
+  border-color: #33402E;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #33402E;
+  border-radius: 9999px;
+}

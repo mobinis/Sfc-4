@@ -1,0 +1,40 @@
+{
+  "entities": {
+    "UserProfile": {
+      "collection": "users",
+      "path": "/users/{userId}",
+      "fields": {
+        "userId": { "type": "string", "required": true },
+        "level": { "type": "number", "required": true },
+        "coins": { "type": "number", "required": true },
+        "totalXp": { "type": "number", "required": true },
+        "lastSync": { "type": "timestamp", "required": false }
+      }
+    },
+    "JournalDocument": {
+      "collection": "journal",
+      "path": "/users/{userId}/journal/{journalId}",
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "userId": { "type": "string", "required": true },
+        "d": { "type": "string", "required": true },
+        "m": { "type": "number", "required": true },
+        "t": { "type": "string", "required": true },
+        "createdAt": { "type": "timestamp", "required": false }
+      }
+    },
+    "HabitDocument": {
+      "collection": "nodes",
+      "path": "/users/{userId}/nodes/{nodeId}",
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "userId": { "type": "string", "required": true },
+        "n": { "type": "string", "required": true },
+        "k": { "type": "string", "required": true },
+        "g": { "type": "number", "required": true },
+        "e": { "type": "string", "required": true },
+        "updatedAt": { "type": "timestamp", "required": false }
+      }
+    }
+  }
+}
