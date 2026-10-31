@@ -1,0 +1,20 @@
+{
+  "appId": "com.selfcare.hero.core",
+  "appName": "SelfCare Hero",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https",
+    "cleartext": false
+  },
+  "plugins": {
+    "Preferences": {
+      "group": "core"
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon_config_sample",
+      "iconColor": "#87A96B",
+      "sound": "beep.wav"
+    }
+  }
+}
