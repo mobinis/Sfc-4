@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 jobs:
   build-apk:
@@ -25,14 +26,19 @@ jobs:
           node-version: 20
           cache: 'npm'
 
-      - name: Set up Java JDK 17 (Temurin)
+      - name: Set up Java JDK 21 (Temurin)
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
 
       - name: Install npm Dependencies
-        run: npm ci
+        run: |
+          if [ -f "package-lock.json" ]; then
+            npm ci || npm install --legacy-peer-deps
+          else
+            npm install --legacy-peer-deps
+          fi
 
       - name: Build Static Web Bundle
         run: npm run build
@@ -73,6 +79,13 @@ jobs:
             exit 1
           fi
           
+          # Ensure file is genuine APK binary (must be >= 1MB)
+          FILE_SIZE=$(stat -c%s "$APK_PATH" 2>/dev/null || stat -f%z "$APK_PATH" 2>/dev/null || echo 0)
+          if [ "$FILE_SIZE" -lt 1000000 ]; then
+            echo "FATAL: Output APK size is only $FILE_SIZE bytes (corrupt or stub). Build failed."
+            exit 1
+          fi
+          
           # Copy to clean deliverable name
           cp "$APK_PATH" SelfCare-Hero-Hybrid.apk
           sha256sum SelfCare-Hero-Hybrid.apk > SelfCare-Hero-Hybrid.apk.sha256
@@ -88,26 +101,30 @@ jobs:
             SelfCare-Hero-Hybrid.apk
             SelfCare-Hero-Hybrid.apk.sha256
           retention-days: 90
+          if-no-files-found: error
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: "v1.0.${{ github.run_number }}"
           name: "SelfCare Hero v1.0.${{ github.run_number }}"
           draft: false
           prerelease: false
+          make_latest: true
           body: |
             ## 🌿 SelfCare Hero — Hybrid Offline PWA (Release v1.0.${{ github.run_number }})
             
             ### Architecture Highlights:
-            - **Offline-First Hybrid PWA + Ionic Capacitor:** Zero native JVM/Kotlin compilation bottlenecks or missing symbols.
+            - **Offline-First Hybrid PWA + Ionic Capacitor:** Zero native compilation bottlenecks or missing symbols.
             - **Dual-Layer Hardware Persistence:** LocalStorage + non-evictable `@capacitor/filesystem` snapshot guard (`selfcare_hero_backup_ring.json`).
             - **SM-2 Spaced Repetition:** Integrated Feynman teach-back cards with mathematical recall retention.
             - **Sage Green Visual Sanctuary:** Built with Tailwind CSS, responsive mobile viewport, and somatic breath pacing (4-7-8 & box).
             
             ### Direct Downloads:
-            - `SelfCare-Hero-Hybrid.apk` (Android 8.0+ / API 26–35)
+            - `SelfCare-Hero-Hybrid.apk` (Android 8.0+ / API 24–35)
             - `SelfCare-Hero-Hybrid.apk.sha256` (Integrity Checksum)
           files: |
             SelfCare-Hero-Hybrid.apk

@@ -154,7 +154,7 @@ export default defineConfig({
               : 'BloomQuest-Restored-Checkpoint.apk';
             const resolution = resolveDeliverable(fileName);
 
-            if (resolution.exists) {
+            if (resolution.exists && resolution.fileSize > 100000) {
               res.writeHead(200, {
                 'Content-Type': 'application/vnd.android.package-archive',
                 'Content-Length': resolution.fileSize,
@@ -163,21 +163,14 @@ export default defineConfig({
               fs.createReadStream(resolution.resolvedPath).pipe(res);
               return;
             } else {
-              const expectedDir = path.dirname(resolution.expectedPrimaryPath);
-              const dirExists = fs.existsSync(expectedDir);
-
-              res.writeHead(404, { 'Content-Type': 'application/json' });
-              res.end(JSON.stringify({
-                status: 'error',
-                error: 'APK deliverable not found on disk',
-                requestedFile: fileName,
-                expectedAbsolutePath: resolution.expectedPrimaryPath,
-                expectedDirectory: expectedDir,
-                directoryExistsOnDisk: dirExists,
-                evaluatedCandidatePaths: resolution.candidatePaths,
-                resolutionGuidance: 'The Android APK is compiled automatically by GitHub Actions (.github/workflows/build-apk.yml) or locally via ./gradlew assembleDebug.',
-                ciWorkflowUrl: 'https://github.com/mobinis/Sfc-4/actions'
-              }, null, 2));
+              // Redirect directly to the compiled GitHub Releases APK deliverable
+              const targetReleaseUrl = 'https://github.com/mobinis/Sfc-4/releases/latest/download/SelfCare-Hero-Hybrid.apk';
+              console.log(`[Deliverable Middleware] Local file not present or empty. Redirecting to official release: ${targetReleaseUrl}`);
+              res.writeHead(302, {
+                'Location': targetReleaseUrl,
+                'Cache-Control': 'no-cache, no-store, must-revalidate'
+              });
+              res.end();
               return;
             }
           }
