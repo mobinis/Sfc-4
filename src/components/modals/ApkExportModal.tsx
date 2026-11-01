@@ -75,9 +75,9 @@ export const ApkExportModal: React.FC<ApkExportModalProps> = ({ isOpen, onClose 
           apkSize: 0,
           zipAvailable: false,
           zipSize: 0,
-          repoUrl: 'https://github.com/mobinis/Self-care-and-life-changing-v3',
-          actionsUrl: 'https://github.com/mobinis/Self-care-and-life-changing-v3/actions/workflows/build-apk.yml',
-          releasesUrl: 'https://github.com/mobinis/Self-care-and-life-changing-v3/releases'
+          repoUrl: 'https://github.com/mobinis/Sfc-4',
+          actionsUrl: 'https://github.com/mobinis/Sfc-4/actions',
+          releasesUrl: 'https://github.com/mobinis/Sfc-4/releases'
         });
       })
       .finally(() => {
@@ -243,15 +243,15 @@ export const ApkExportModal: React.FC<ApkExportModalProps> = ({ isOpen, onClose 
             {apkStatus?.apkAvailable ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <a
-                  href="/downloads/BloomQuest-Restored-Checkpoint.apk"
-                  download="BloomQuest-Restored-Checkpoint.apk"
+                  href="/downloads/SelfCare-Hero-Hybrid.apk"
+                  download="SelfCare-Hero-Hybrid.apk"
                   className="flex items-center justify-between p-3 rounded-xl bg-[#1B211E] border border-[#384A41] hover:border-[#3D7D62] text-[#F4F7F4] hover:bg-[#242D29] transition-all group"
                 >
                   <div className="flex items-center gap-2.5">
                     <Smartphone className="w-5 h-5 text-[#3D7D62] group-hover:scale-110 transition-transform" />
                     <div className="text-left">
-                      <p className="text-xs font-bold">Android APK</p>
-                      <p className="text-[10px] text-[#859A90]">96 MB • Ready to Install</p>
+                      <p className="text-xs font-bold">SelfCare Hero APK</p>
+                      <p className="text-[10px] text-[#859A90]">Hybrid PWA • Ready to Install</p>
                     </div>
                   </div>
                   <Download className="w-4 h-4 text-[#859A90] group-hover:text-[#F4F7F4]" />
@@ -265,8 +265,8 @@ export const ApkExportModal: React.FC<ApkExportModalProps> = ({ isOpen, onClose 
                   <div className="flex items-center gap-2.5">
                     <FileArchive className="w-5 h-5 text-[#E5A93C] group-hover:scale-110 transition-transform" />
                     <div className="text-left">
-                      <p className="text-xs font-bold">Release ZIP</p>
-                      <p className="text-[10px] text-[#859A90]">51 MB • APK + SHA256</p>
+                      <p className="text-xs font-bold">Release Package</p>
+                      <p className="text-[10px] text-[#859A90]">Archive + SHA256</p>
                     </div>
                   </div>
                   <Download className="w-4 h-4 text-[#859A90] group-hover:text-[#F4F7F4]" />
@@ -280,12 +280,12 @@ export const ApkExportModal: React.FC<ApkExportModalProps> = ({ isOpen, onClose 
                     <span>Download from GitHub Actions Pipeline</span>
                   </div>
                   <p className="text-[11px] text-[#859A90] leading-relaxed">
-                    The 96 MB compiled binary is produced by the automated CI build runner in your GitHub repository.
+                    The Android APK is compiled and packaged automatically by your repository&apos;s CI runner.
                   </p>
                   
                   <div className="pt-1 flex flex-col sm:flex-row gap-2">
                     <a
-                      href="https://github.com/mobinis/Self-care-and-life-changing-v3/actions"
+                      href="https://github.com/mobinis/Sfc-4/actions"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex-1 py-2.5 px-3 rounded-xl bg-[#2D6A4F] hover:bg-[#22533E] text-white text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm"
@@ -296,7 +296,7 @@ export const ApkExportModal: React.FC<ApkExportModalProps> = ({ isOpen, onClose 
                     </a>
 
                     <a
-                      href="https://github.com/mobinis/Self-care-and-life-changing-v3/releases"
+                      href="https://github.com/mobinis/Sfc-4/releases"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="py-2.5 px-3 rounded-xl bg-[#1B211E] hover:bg-[#242D29] border border-[#384A41] text-[#F4F7F4] text-xs font-bold flex items-center justify-center gap-1.5 transition-all"
@@ -308,11 +308,12 @@ export const ApkExportModal: React.FC<ApkExportModalProps> = ({ isOpen, onClose 
                 </div>
 
                 <div className="p-2.5 rounded-xl bg-[#1B211E] border border-[#384A41]/60 text-[11px] text-[#859A90] space-y-1">
-                  <span className="font-bold text-[#F4F7F4] block">How to download on GitHub:</span>
+                  <span className="font-bold text-[#F4F7F4] block">How to download your APK on GitHub:</span>
                   <ol className="list-decimal list-inside space-y-0.5 text-[10px]">
-                    <li>Open the GitHub Actions tab above.</li>
-                    <li>Click the latest run: <span className="text-[#F4F7F4] font-mono">Build Android APK & Publish Release</span>.</li>
-                    <li>Scroll down to <span className="text-[#E5A93C] font-bold">Artifacts</span> and click <span className="text-[#F4F7F4] font-mono font-bold">BloomQuest-Restored-Checkpoint-APK</span>.</li>
+                    <li>Open the GitHub Actions link above (<span className="text-[#87A96B] font-mono">mobinis/Sfc-4</span>).</li>
+                    <li>Click the latest workflow run: <span className="text-[#F4F7F4] font-mono">Build SelfCare Hero Hybrid Android APK</span>.</li>
+                    <li>Scroll down to the <span className="text-[#E5A93C] font-bold">Artifacts</span> section and click <span className="text-[#F4F7F4] font-mono font-bold">SelfCare-Hero-Hybrid-APK</span> to download instantly!</li>
+                    <li>Or click <span className="text-[#87A96B] font-bold">Releases</span> on the repository sidebar to download the published APK asset.</li>
                   </ol>
                 </div>
               </div>

@@ -15383,7 +15383,7 @@ function generateAdaptiveReminders(state, now = /* @__PURE__ */ new Date()) {
       if (!app2.dailyCeilingMinutes || app2.dailyCeilingMinutes <= 0) return;
       const id = `screentime_limit_${app2.id}`;
       if (isSnoozedOrDismissed(id)) return;
-      const minutesUsedToday = (state.screenTimeSessions || []).filter((s) => s.date === today && (s.appId === app2.id || s.appName === app2.name)).reduce((sum, s) => sum + (s.durationMinutes || 0), 0);
+      const minutesUsedToday = (state.screenTimeSessions || []).filter((s2) => s2.date === today && (s2.appId === app2.id || s2.appName === app2.name)).reduce((sum, s2) => sum + (s2.durationMinutes || 0), 0);
       if (minutesUsedToday >= app2.dailyCeilingMinutes) {
         reminders.push({
           id,
@@ -17932,7 +17932,7 @@ var NotificationType;
   NotificationType2["Error"] = "ERROR";
 })(NotificationType || (NotificationType = {}));
 const Haptics = registerPlugin("Haptics", {
-  web: () => __vitePreload(() => import("./web-BKZrcMiy.js"), true ? [] : void 0).then((m) => new m.HapticsWeb())
+  web: () => __vitePreload(() => import("./web-DTKaK8dz.js"), true ? [] : void 0).then((m) => new m.HapticsWeb())
 });
 class SoundHapticsManager {
   constructor() {
@@ -18466,8 +18466,320 @@ replaceTraps$1((oldTraps) => ({
   }
 }));
 const Preferences = registerPlugin("Preferences", {
-  web: () => __vitePreload(() => import("./web-CcFdrLcy.js"), true ? [] : void 0).then((m) => new m.PreferencesWeb())
+  web: () => __vitePreload(() => import("./web-CXPw9u3K.js"), true ? [] : void 0).then((m) => new m.PreferencesWeb())
 });
+function s(t) {
+  t.CapacitorUtils.Synapse = new Proxy(
+    {},
+    {
+      get(e, n) {
+        return new Proxy({}, {
+          get(w, o) {
+            return (c, p, r) => {
+              const i = t.Capacitor.Plugins[n];
+              if (i === void 0) {
+                r(new Error(`Capacitor plugin ${n} not found`));
+                return;
+              }
+              if (typeof i[o] != "function") {
+                r(new Error(`Method ${o} not found in Capacitor plugin ${n}`));
+                return;
+              }
+              (async () => {
+                try {
+                  const a = await i[o](c);
+                  p(a);
+                } catch (a) {
+                  r(a);
+                }
+              })();
+            };
+          }
+        });
+      }
+    }
+  );
+}
+function u(t) {
+  t.CapacitorUtils.Synapse = new Proxy(
+    {},
+    {
+      get(e, n) {
+        return t.cordova.plugins[n];
+      }
+    }
+  );
+}
+function f(t = false) {
+  typeof window > "u" || (window.CapacitorUtils = window.CapacitorUtils || {}, window.Capacitor !== void 0 && !t ? s(window) : window.cordova !== void 0 && u(window));
+}
+var Directory;
+(function(Directory2) {
+  Directory2["Documents"] = "DOCUMENTS";
+  Directory2["Data"] = "DATA";
+  Directory2["Library"] = "LIBRARY";
+  Directory2["Cache"] = "CACHE";
+  Directory2["External"] = "EXTERNAL";
+  Directory2["ExternalStorage"] = "EXTERNAL_STORAGE";
+  Directory2["ExternalCache"] = "EXTERNAL_CACHE";
+  Directory2["LibraryNoCloud"] = "LIBRARY_NO_CLOUD";
+  Directory2["Temporary"] = "TEMPORARY";
+})(Directory || (Directory = {}));
+var Encoding;
+(function(Encoding2) {
+  Encoding2["UTF8"] = "utf8";
+  Encoding2["ASCII"] = "ascii";
+  Encoding2["UTF16"] = "utf16";
+})(Encoding || (Encoding = {}));
+const Filesystem = registerPlugin("Filesystem", {
+  web: () => __vitePreload(() => import("./web-BLqiz6lI.js"), true ? [] : void 0).then((m) => new m.FilesystemWeb())
+});
+f();
+const PRIMARY_STORAGE_KEY = "selfcare_hero_app_state";
+const BACKUP_FILE_NAME = "selfcare_hero_backup_ring.json";
+const CURRENT_SCHEMA_VERSION = 3;
+function hasMeaningfulStateData(state) {
+  if (!state || typeof state !== "object") {
+    return false;
+  }
+  const hasNodes = Array.isArray(state.nodes) && state.nodes.length > 0;
+  const hasEvents = Array.isArray(state.ev) && state.ev.length > 0;
+  const hasJournal = Array.isArray(state.jr) && state.jr.length > 0;
+  const hasUrges = Array.isArray(state.urges) && state.urges.length > 0;
+  const hasRoutines = Array.isArray(state.routines) && state.routines.length > 0;
+  const hasRoadmap = Array.isArray(state.roadmapGoals) && state.roadmapGoals.length > 0;
+  const hasStreak = state.dailyThreeStreak && typeof state.dailyThreeStreak.cur === "number";
+  return Boolean(hasNodes || hasEvents || hasJournal || hasUrges || hasRoutines || hasRoadmap || hasStreak);
+}
+function migrateSchema(rawState) {
+  if (!rawState || typeof rawState !== "object") {
+    return createDefaultState();
+  }
+  const state = { ...rawState };
+  let currentVer = state.db_version || state.v || 1;
+  if (currentVer < 2) {
+    if (!state.circadianConfig) {
+      state.circadianConfig = {
+        wakeTimeStr: "06:30",
+        bedTimeStr: "22:30",
+        caffeineCutoffHoursBeforeSleep: 9,
+        screenCurfewHoursBeforeSleep: 1,
+        enabled: true
+      };
+    }
+    if (!state.urges) state.urges = [];
+    if (!state.antiGoals) state.antiGoals = [];
+    currentVer = 2;
+  }
+  if (currentVer < 3) {
+    state.db_version = 3;
+    state.v = 19;
+    if (!state.roadmapGoals) state.roadmapGoals = [];
+    if (!state.roadmapSteps) state.roadmapSteps = [];
+    if (!state.roadmapTags) state.roadmapTags = [];
+    if (!state.measurableTargets) state.measurableTargets = [];
+    if (!state.activityRecords) state.activityRecords = [];
+    if (!state.sharedTags) state.sharedTags = [];
+    if (!state.learnStack) state.learnStack = [];
+    if (!state.nodes) state.nodes = [];
+    if (!state.ev) state.ev = [];
+    if (!state.jr) state.jr = [];
+    if (!state.routines) state.routines = [];
+    if (!state.coins) state.coins = 0;
+    if (!state.dailyThreeStreak) {
+      state.dailyThreeStreak = { cur: 0, max: 0, last: "" };
+    }
+    currentVer = 3;
+  }
+  state.db_version = CURRENT_SCHEMA_VERSION;
+  state.last_migrated_at = (/* @__PURE__ */ new Date()).toISOString();
+  return state;
+}
+class NativeStorageService {
+  constructor() {
+    this.isFilesystemAvailable = typeof window !== "undefined" && "Capacitor" in window;
+    this.saveDebounceTimer = null;
+  }
+  /**
+   * Load state with automatic failover and self-healing cross-sync
+   * @returns {Promise<object>}
+   */
+  async loadState() {
+    let primaryData = null;
+    let backupData = null;
+    try {
+      if (typeof window !== "undefined") {
+        const raw = localStorage.getItem(PRIMARY_STORAGE_KEY) || localStorage.getItem("bloomquest_state_v19");
+        if (raw) {
+          primaryData = JSON.parse(raw);
+        }
+      }
+    } catch (err) {
+      console.warn("[NativeStorageService] Primary localStorage read error:", err);
+    }
+    try {
+      const fileResult = await Filesystem.readFile({
+        path: BACKUP_FILE_NAME,
+        directory: Directory.Data,
+        encoding: Encoding.UTF8
+      });
+      if (fileResult && fileResult.data) {
+        backupData = JSON.parse(fileResult.data);
+      }
+    } catch {
+    }
+    let resolvedState = null;
+    if (hasMeaningfulStateData(primaryData)) {
+      resolvedState = primaryData;
+      if (!backupData || !hasMeaningfulStateData(backupData)) {
+        this.writeToFilesystem(resolvedState);
+      }
+    } else if (hasMeaningfulStateData(backupData)) {
+      console.info("[NativeStorageService] Primary storage missing or evicted. Restoring from Hardware Filesystem Backup!");
+      resolvedState = backupData;
+      try {
+        localStorage.setItem(PRIMARY_STORAGE_KEY, JSON.stringify(resolvedState));
+      } catch {
+      }
+    } else {
+      console.info("[NativeStorageService] Initializing default application state.");
+      resolvedState = createDefaultState();
+      this.saveState(resolvedState);
+    }
+    return migrateSchema(resolvedState);
+  }
+  /**
+   * Save state across both hardware layers with debouncing and integrity check
+   * @param {object} state 
+   */
+  saveState(state) {
+    if (!state) return;
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.setItem(PRIMARY_STORAGE_KEY, JSON.stringify(state));
+        localStorage.setItem("bloomquest_state_v19", JSON.stringify(state));
+      }
+    } catch (err) {
+      console.warn("[NativeStorageService] localStorage save error:", err);
+    }
+    if (this.saveDebounceTimer) {
+      clearTimeout(this.saveDebounceTimer);
+    }
+    this.saveDebounceTimer = setTimeout(() => {
+      if (hasMeaningfulStateData(state)) {
+        this.writeToFilesystem(state);
+      }
+    }, 200);
+  }
+  /**
+   * Non-evictable direct write to native hardware file
+   * @param {object} state 
+   */
+  async writeToFilesystem(state) {
+    try {
+      const payload = {
+        _savedAt: (/* @__PURE__ */ new Date()).toISOString(),
+        _timestamp: Date.now(),
+        db_version: CURRENT_SCHEMA_VERSION,
+        ...state
+      };
+      await Filesystem.writeFile({
+        path: BACKUP_FILE_NAME,
+        data: JSON.stringify(payload, null, 2),
+        directory: Directory.Data,
+        encoding: Encoding.UTF8
+      });
+      console.debug("[NativeStorageService] Hardware disk backup synchronized successfully.");
+    } catch (err) {
+      console.debug("[NativeStorageService] Filesystem write skipped (running in browser environment).");
+    }
+  }
+  /**
+   * Manual JSON snapshot export for external backup
+   * @param {object} state 
+   * @returns {string}
+   */
+  exportBackupSnapshot(state) {
+    const backup = {
+      app: "SelfCare Hero",
+      exportedAt: (/* @__PURE__ */ new Date()).toISOString(),
+      db_version: CURRENT_SCHEMA_VERSION,
+      state: migrateSchema(state)
+    };
+    return JSON.stringify(backup, null, 2);
+  }
+  /**
+   * Manual JSON snapshot restore
+   * @param {string} jsonString 
+   * @returns {object}
+   */
+  importBackupSnapshot(jsonString) {
+    const parsed = JSON.parse(jsonString);
+    const candidate = parsed.state || parsed;
+    if (!hasMeaningfulStateData(candidate)) {
+      throw new Error("Invalid backup file: Payload does not contain meaningful SelfCare Hero state.");
+    }
+    const migrated = migrateSchema(candidate);
+    this.saveState(migrated);
+    return migrated;
+  }
+}
+function createDefaultState() {
+  return {
+    db_version: CURRENT_SCHEMA_VERSION,
+    v: 19,
+    nodes: [],
+    ev: [],
+    jr: [],
+    rm: [],
+    st: [],
+    urges: [],
+    learnStack: [],
+    goodDeeds: [],
+    rewardShop: [],
+    weeklyReviews: [],
+    dailyThreeStreak: { cur: 0, max: 0, last: "" },
+    snapshots: [],
+    lowEnergyMode: false,
+    lowEnergyEssentialIds: [],
+    restDayTokens: 2,
+    usedRestDays: [],
+    lastVisitDate: (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
+    comebackBonus: null,
+    coins: 50,
+    routines: [],
+    habitStacks: [],
+    activeMomentumHabitId: null,
+    aiChatHistory: [],
+    antiGoals: [],
+    activeSprint: null,
+    circadianConfig: {
+      wakeTimeStr: "06:30",
+      bedTimeStr: "22:30",
+      caffeineCutoffHoursBeforeSleep: 9,
+      screenCurfewHoursBeforeSleep: 1,
+      enabled: true
+    },
+    habitContracts: [],
+    penaltyVaultCoins: 0,
+    weeklyQuests: [],
+    isDarkMode: true,
+    videoResources: [],
+    bookResources: [],
+    pinLockEnabled: false,
+    pinHash: "",
+    lockJournal: false,
+    lockUrges: false,
+    lockAppLaunch: false,
+    roadmapGoals: [],
+    roadmapSteps: [],
+    roadmapTags: [],
+    measurableTargets: [],
+    activityRecords: [],
+    sharedTags: []
+  };
+}
+const nativeStorageService = new NativeStorageService();
 const DB_NAME$2 = "SelfCareHeroHardwareDB";
 const DB_VERSION$2 = 1;
 const STORE_NAME$1 = "hardware_persistence";
@@ -18605,6 +18917,10 @@ class StoragePersistenceService {
         localStorage.setItem(key, jsonStr);
         localStorage.setItem("bloomquest_state_v19", JSON.stringify(state));
       }
+    } catch {
+    }
+    try {
+      await nativeStorageService.writeToFilesystem(state);
     } catch {
     }
   }
@@ -18888,7 +19204,7 @@ const AppProvider = ({ children }) => {
       };
       triggerXpFeedback(customXp, "Habit completed");
       awardCoins(2);
-      const stack = state.habitStacks.find((s) => s.triggerHabitId === habitId);
+      const stack = state.habitStacks.find((s2) => s2.triggerHabitId === habitId);
       if (stack) {
         showToast(`⚡ Habit Stack: ${stack.promptMessage} (+${stack.momentumBonusXp} XP available)`);
       }
@@ -19288,7 +19604,7 @@ const AppProvider = ({ children }) => {
     showToast(`Snapshot '${label}' created successfully`);
   };
   const restoreBackupSnapshot = (snapshotId) => {
-    const snap = state.snapshots.find((s) => s.id === snapshotId);
+    const snap = state.snapshots.find((s2) => s2.id === snapshotId);
     if (!snap) return false;
     try {
       const parsed = JSON.parse(snap.stateJson);
@@ -19481,7 +19797,7 @@ const AppProvider = ({ children }) => {
     setState((prev) => ({
       ...prev,
       roadmapGoals: prev.roadmapGoals.filter((g) => g.id !== id),
-      roadmapSteps: prev.roadmapSteps.filter((s) => s.goalId !== id)
+      roadmapSteps: prev.roadmapSteps.filter((s2) => s2.goalId !== id)
     }));
     showToast("Learning goal deleted");
   };
@@ -19504,25 +19820,25 @@ const AppProvider = ({ children }) => {
     const now = Date.now();
     setState((prev) => ({
       ...prev,
-      roadmapSteps: prev.roadmapSteps.map((s) => s.id === id ? { ...s, ...updates, updatedAt: now } : s)
+      roadmapSteps: prev.roadmapSteps.map((s2) => s2.id === id ? { ...s2, ...updates, updatedAt: now } : s2)
     }));
     showToast("Step updated");
   };
   const deleteRoadmapStep = (id) => {
     setState((prev) => ({
       ...prev,
-      roadmapSteps: prev.roadmapSteps.filter((s) => s.id !== id && s.parentId !== id)
+      roadmapSteps: prev.roadmapSteps.filter((s2) => s2.id !== id && s2.parentId !== id)
     }));
     showToast("Step deleted");
   };
   const toggleRoadmapStepComplete = (id) => {
-    const target = state.roadmapSteps.find((s) => s.id === id);
+    const target = state.roadmapSteps.find((s2) => s2.id === id);
     if (!target) return;
     const nextCompleted = !target.isCompleted;
     const now = Date.now();
     setState((prev) => ({
       ...prev,
-      roadmapSteps: prev.roadmapSteps.map((s) => s.id === id ? { ...s, isCompleted: nextCompleted, updatedAt: now } : s)
+      roadmapSteps: prev.roadmapSteps.map((s2) => s2.id === id ? { ...s2, isCompleted: nextCompleted, updatedAt: now } : s2)
     }));
     if (nextCompleted) {
       soundManager.playChime("success");
@@ -19735,7 +20051,7 @@ const AppProvider = ({ children }) => {
       }).filter((e) => e.c > 0 || e.x > 0);
       const updatedWorkouts = prev.workoutSessions.filter((w) => w.activityRecordId !== id);
       const updatedReading = prev.readingSessions.filter((r) => r.activityRecordId !== id);
-      const updatedScreenTime = (prev.screenTimeSessions || []).filter((s) => s.activityRecordId !== id);
+      const updatedScreenTime = (prev.screenTimeSessions || []).filter((s2) => s2.activityRecordId !== id);
       const updatedImpact = (prev.impactDeeds || []).filter((d) => d.activityRecordId !== id);
       return {
         ...prev,
@@ -19799,10 +20115,10 @@ const AppProvider = ({ children }) => {
     const updatedExerciseLibrary = state.exerciseLibrary.map((ex) => {
       const match = session.exercises.find((e) => e.exerciseId === ex.id);
       if (!match) return ex;
-      const completedSets = match.sets.filter((s) => s.isCompleted);
+      const completedSets = match.sets.filter((s2) => s2.isCompleted);
       if (completedSets.length === 0) return ex;
-      const sessionMaxReps = Math.max(...completedSets.map((s) => s.reps));
-      const sessionMaxWeight = Math.max(...completedSets.map((s) => s.weightKg || 0));
+      const sessionMaxReps = Math.max(...completedSets.map((s2) => s2.reps));
+      const sessionMaxWeight = Math.max(...completedSets.map((s2) => s2.weightKg || 0));
       const prevPb = ex.personalBest || {};
       let brokePb = false;
       const nextPb = { ...prevPb, lastPerformedDate: sessionDate };
@@ -20200,10 +20516,10 @@ const AppProvider = ({ children }) => {
   const deleteScreenTimeSession = (id) => {
     setState((prev) => {
       var _a;
-      const targetActId = (_a = prev.screenTimeSessions.find((s) => s.id === id)) == null ? void 0 : _a.activityRecordId;
+      const targetActId = (_a = prev.screenTimeSessions.find((s2) => s2.id === id)) == null ? void 0 : _a.activityRecordId;
       return {
         ...prev,
-        screenTimeSessions: prev.screenTimeSessions.filter((s) => s.id !== id),
+        screenTimeSessions: prev.screenTimeSessions.filter((s2) => s2.id !== id),
         activityRecords: targetActId ? prev.activityRecords.filter((a) => a.id !== targetActId) : prev.activityRecords
       };
     });
@@ -23275,7 +23591,7 @@ const RoutinePlayerModal = ({
   const handleNextStep = () => {
     setCompletedSteps((prev) => new Set(prev).add(currentStepIdx));
     if (isLastStep) {
-      const habitIds = routine.steps.map((s) => s.linkedHabitId).filter(Boolean);
+      const habitIds = routine.steps.map((s2) => s2.linkedHabitId).filter(Boolean);
       onComplete(routine.id, habitIds);
       soundManager.playChime("levelUp");
       onClose();
@@ -23286,8 +23602,8 @@ const RoutinePlayerModal = ({
   };
   const formatTime = (secs) => {
     const m = Math.floor(secs / 60);
-    const s = secs % 60;
-    return `${m}:${s < 10 ? "0" : ""}${s}`;
+    const s2 = secs % 60;
+    return `${m}:${s2 < 10 ? "0" : ""}${s2}`;
   };
   if (!isOpen || !routine) return null;
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full max-w-lg rounded-2xl bg-[#1B211E] border border-[#384A41] p-6 shadow-2xl flex flex-col gap-5 light:bg-white light:border-[#E5E3DA]", children: [
@@ -23313,12 +23629,12 @@ const RoutinePlayerModal = ({
         }
       )
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex gap-1.5", children: routine.steps.map((s, idx) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex gap-1.5", children: routine.steps.map((s2, idx) => /* @__PURE__ */ jsxRuntimeExports.jsx(
       "div",
       {
         className: `flex-1 h-1.5 rounded-full transition-colors ${completedSteps.has(idx) ? "bg-[#3D7D62]" : idx === currentStepIdx ? "bg-[#E5A93C]" : "bg-[#242D29] light:bg-[#E5E3DA]"}`
       },
-      s.id
+      s2.id
     )) }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-2xl bg-[#242D29] border border-[#384A41] p-6 flex flex-col items-center justify-center text-center gap-4 light:bg-[#EFECE6] light:border-[#E5E3DA]", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-14 h-14 rounded-2xl bg-[#2A5643] border border-[#3D7D62] text-[#E8F3ED] flex items-center justify-center text-3xl shadow-sm light:bg-[#E8F3ED] light:text-[#1C3026]", children: (currentStep == null ? void 0 : currentStep.icon) || "⏱️" }),
@@ -24705,7 +25021,7 @@ const FutureLearningView = () => {
   const [selectedTagFilter, setSelectedTagFilter] = reactExports.useState("all");
   const [selectedStatusFilter, setSelectedStatusFilter] = reactExports.useState("all");
   const [expandedGoalIds, setExpandedGoalIds] = reactExports.useState(new Set(state.roadmapGoals.map((g) => g.id)));
-  const [expandedStepIds, setExpandedStepIds] = reactExports.useState(new Set(state.roadmapSteps.map((s) => s.id)));
+  const [expandedStepIds, setExpandedStepIds] = reactExports.useState(new Set(state.roadmapSteps.map((s2) => s2.id)));
   const [isGoalModalOpen, setIsGoalModalOpen] = reactExports.useState(false);
   const [editingGoal, setEditingGoal] = reactExports.useState(null);
   const [isStepModalOpen, setIsStepModalOpen] = reactExports.useState(false);
@@ -24767,9 +25083,9 @@ const FutureLearningView = () => {
     setNotesModalItem(null);
   };
   const getGoalStats = (goalId) => {
-    const steps = state.roadmapSteps.filter((s) => s.goalId === goalId && !s.isArchived);
+    const steps = state.roadmapSteps.filter((s2) => s2.goalId === goalId && !s2.isArchived);
     if (steps.length === 0) return { total: 0, completed: 0, percent: 0 };
-    const completed = steps.filter((s) => s.isCompleted).length;
+    const completed = steps.filter((s2) => s2.isCompleted).length;
     return {
       total: steps.length,
       completed,
@@ -24781,7 +25097,7 @@ const FutureLearningView = () => {
       const q = searchQuery.toLowerCase();
       const matchTitle = goal.title.toLowerCase().includes(q);
       const matchDesc = goal.description.toLowerCase().includes(q);
-      const matchSteps = state.roadmapSteps.some((s) => s.goalId === goal.id && s.title.toLowerCase().includes(q));
+      const matchSteps = state.roadmapSteps.some((s2) => s2.goalId === goal.id && s2.title.toLowerCase().includes(q));
       if (!matchTitle && !matchDesc && !matchSteps) return false;
     }
     if (selectedTagFilter !== "all") {
@@ -24930,7 +25246,7 @@ const FutureLearningView = () => {
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[11px] text-[#859A90] light:text-[#5C655E]", children: "Tap item to inspect" })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-col gap-3", children: filteredGoals.map((goal) => {
-        const goalSteps = state.roadmapSteps.filter((s) => s.goalId === goal.id && s.plannedDate);
+        const goalSteps = state.roadmapSteps.filter((s2) => s2.goalId === goal.id && s2.plannedDate);
         return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-3 rounded-2xl bg-[#242D29] border border-[#384A41]/70 light:bg-[#F7F6F2] light:border-[#E5E3DA]", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-bold text-[#F4F7F4] light:text-[#1C221E]", children: goal.title }),
@@ -24965,7 +25281,7 @@ const FutureLearningView = () => {
     viewMode === "list" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-col gap-3", children: filteredGoals.map((goal) => {
       const stats = getGoalStats(goal.id);
       const isExpanded = expandedGoalIds.has(goal.id);
-      const topSteps = state.roadmapSteps.filter((s) => s.goalId === goal.id && !s.parentId && !s.isArchived).sort((a, b) => a.order - b.order);
+      const topSteps = state.roadmapSteps.filter((s2) => s2.goalId === goal.id && !s2.parentId && !s2.isArchived).sort((a, b) => a.order - b.order);
       return /* @__PURE__ */ jsxRuntimeExports.jsxs(
         "div",
         {
@@ -25119,7 +25435,7 @@ const FutureLearningView = () => {
                 )
               ] }),
               topSteps.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-[#859A90] italic py-2 light:text-[#5C655E]", children: "No prerequisites yet. Add smaller steps to build your roadmap!" }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-col gap-2", children: topSteps.map((step, stepIdx) => {
-                const subSteps = state.roadmapSteps.filter((s) => s.parentId === step.id && !s.isArchived).sort((a, b) => a.order - b.order);
+                const subSteps = state.roadmapSteps.filter((s2) => s2.parentId === step.id && !s2.isArchived).sort((a, b) => a.order - b.order);
                 const isStepBranchOpen = expandedStepIds.has(step.id);
                 return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-1.5", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -26448,8 +26764,8 @@ const WorkoutPlayerModal = ({
   const activeExMeta = state.exerciseLibrary.find((e) => e.id === (activeLog == null ? void 0 : activeLog.exerciseId));
   const formatTime = (secs) => {
     const m = Math.floor(secs / 60);
-    const s = secs % 60;
-    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+    const s2 = secs % 60;
+    return `${m.toString().padStart(2, "0")}:${s2.toString().padStart(2, "0")}`;
   };
   const handleStartRest = (seconds) => {
     setRestTimerTarget(seconds);
@@ -26525,7 +26841,7 @@ const WorkoutPlayerModal = ({
   const handleRemoveSet = (setIdx) => {
     if (!activeLog || activeLog.sets.length <= 1) return;
     const updatedLogs = [...exerciseLogs];
-    updatedLogs[activeExerciseIndex].sets = updatedLogs[activeExerciseIndex].sets.filter((_, i) => i !== setIdx).map((s, idx) => ({ ...s, setNumber: idx + 1 }));
+    updatedLogs[activeExerciseIndex].sets = updatedLogs[activeExerciseIndex].sets.filter((_, i) => i !== setIdx).map((s2, idx) => ({ ...s2, setNumber: idx + 1 }));
     setExerciseLogs(updatedLogs);
   };
   const handleAddExerciseToWorkout = (ex) => {
@@ -26549,16 +26865,16 @@ const WorkoutPlayerModal = ({
     setIsAddExerciseOpen(false);
   };
   const totalCompletedSets = exerciseLogs.reduce(
-    (sum, ex) => sum + ex.sets.filter((s) => s.isCompleted).length,
+    (sum, ex) => sum + ex.sets.filter((s2) => s2.isCompleted).length,
     0
   );
   const totalSets = exerciseLogs.reduce((sum, ex) => sum + ex.sets.length, 0);
   const totalVolumeReps = exerciseLogs.reduce(
-    (sum, ex) => sum + ex.sets.filter((s) => s.isCompleted).reduce((sSum, s) => sSum + s.reps, 0),
+    (sum, ex) => sum + ex.sets.filter((s2) => s2.isCompleted).reduce((sSum, s2) => sSum + s2.reps, 0),
     0
   );
   exerciseLogs.reduce(
-    (sum, ex) => sum + ex.sets.filter((s) => s.isCompleted).reduce((sSum, s) => sSum + s.reps * (s.weightKg || 0), 0),
+    (sum, ex) => sum + ex.sets.filter((s2) => s2.isCompleted).reduce((sSum, s2) => sSum + s2.reps * (s2.weightKg || 0), 0),
     0
   );
   const handleFinishWorkout = () => {
@@ -26700,7 +27016,7 @@ const WorkoutPlayerModal = ({
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1.5 overflow-x-auto py-3 no-scrollbar", children: [
       exerciseLogs.map((log, idx) => {
-        const isCompleted = log.sets.every((s) => s.isCompleted);
+        const isCompleted = log.sets.every((s2) => s2.isCompleted);
         const isActive = idx === activeExerciseIndex;
         return /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "button",
@@ -28990,11 +29306,11 @@ const ReadingHubView = () => {
   const [searchQuery, setSearchQuery] = reactExports.useState("");
   const today = DateUtils.todayStr();
   const allSessions = state.readingSessions || [];
-  const totalPagesRead = allSessions.reduce((acc, s) => acc + (s.pagesRead || 0), 0);
-  const totalMinutesRead = allSessions.reduce((acc, s) => acc + (s.durationMinutes || 0), 0);
+  const totalPagesRead = allSessions.reduce((acc, s2) => acc + (s2.pagesRead || 0), 0);
+  const totalMinutesRead = allSessions.reduce((acc, s2) => acc + (s2.durationMinutes || 0), 0);
   const totalHoursRead = (totalMinutesRead / 60).toFixed(1);
-  const todaySessions = allSessions.filter((s) => s.date === today);
-  const todayPagesRead = todaySessions.reduce((acc, s) => acc + (s.pagesRead || 0), 0);
+  const todaySessions = allSessions.filter((s2) => s2.date === today);
+  const todayPagesRead = todaySessions.reduce((acc, s2) => acc + (s2.pagesRead || 0), 0);
   const completedBooks = state.bookResources.filter((b) => b.status === "completed");
   const activeBooks = state.bookResources.filter((b) => b.status === "reading");
   const avgSpeed = allSessions.length > 0 && totalMinutesRead > 0 ? Math.round(totalPagesRead / totalMinutesRead * 60) : 35;
@@ -29010,9 +29326,9 @@ const ReadingHubView = () => {
   });
   const readingTargets = state.measurableTargets.filter((t) => t.category === "reading" && t.status === "active");
   const collectedQuotes = [];
-  allSessions.forEach((s) => {
-    if (s.favoriteQuote && !collectedQuotes.some((q) => q.quote === s.favoriteQuote)) {
-      collectedQuotes.push({ quote: s.favoriteQuote, bookTitle: s.bookTitle, author: s.author });
+  allSessions.forEach((s2) => {
+    if (s2.favoriteQuote && !collectedQuotes.some((q) => q.quote === s2.favoriteQuote)) {
+      collectedQuotes.push({ quote: s2.favoriteQuote, bookTitle: s2.bookTitle, author: s2.author });
     }
   });
   state.bookResources.forEach((b) => {
@@ -29891,10 +30207,10 @@ const DigitalWellbeingHubView = () => {
   const [isAddAppModalOpen, setIsAddAppModalOpen] = reactExports.useState(false);
   const today = DateUtils.todayStr();
   const allSessions = state.screenTimeSessions || [];
-  const todaySessions = allSessions.filter((s) => s.date === today);
-  const todayTotalMinutes = todaySessions.reduce((acc, s) => acc + (s.durationMinutes || 0), 0);
-  const todayMindlessMinutes = todaySessions.filter((s) => !s.isIntentional).reduce((acc, s) => acc + (s.durationMinutes || 0), 0);
-  const todayIntentionalMinutes = todaySessions.filter((s) => s.isIntentional).reduce((acc, s) => acc + (s.durationMinutes || 0), 0);
+  const todaySessions = allSessions.filter((s2) => s2.date === today);
+  const todayTotalMinutes = todaySessions.reduce((acc, s2) => acc + (s2.durationMinutes || 0), 0);
+  const todayMindlessMinutes = todaySessions.filter((s2) => !s2.isIntentional).reduce((acc, s2) => acc + (s2.durationMinutes || 0), 0);
+  const todayIntentionalMinutes = todaySessions.filter((s2) => s2.isIntentional).reduce((acc, s2) => acc + (s2.durationMinutes || 0), 0);
   const intentionalRatio = todayTotalMinutes > 0 ? Math.round(todayIntentionalMinutes / todayTotalMinutes * 100) : 100;
   const totalDailyCeiling = state.screenTimeApps.reduce((acc, a) => acc + (a.dailyCeilingMinutes || 0), 0);
   const bedtime = ((_a = state.circadianConfig) == null ? void 0 : _a.bedTimeStr) || "23:00";
@@ -30018,8 +30334,8 @@ const DigitalWellbeingHubView = () => {
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[11px] text-[#859A90]", children: "Ceiling resets daily at midnight" })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-2.5", children: state.screenTimeApps.map((app2) => {
-        const appSessions = todaySessions.filter((s) => s.appId === app2.id || s.appName.toLowerCase().includes(app2.name.toLowerCase()));
-        const appMinutes = appSessions.reduce((acc, s) => acc + s.durationMinutes, 0);
+        const appSessions = todaySessions.filter((s2) => s2.appId === app2.id || s2.appName.toLowerCase().includes(app2.name.toLowerCase()));
+        const appMinutes = appSessions.reduce((acc, s2) => acc + s2.durationMinutes, 0);
         const ceiling = app2.dailyCeilingMinutes || 1;
         const pct = Math.min(100, Math.round(appMinutes / ceiling * 100));
         const isExceeded = appMinutes > ceiling;
@@ -31194,17 +31510,17 @@ const ImpactHubView = () => {
         { id: "favorites", label: "⭐ Pinned" },
         { id: "family", label: "🏡 Family" },
         { id: "friends", label: "✨ Friends" }
-      ].map((f) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ].map((f2) => /* @__PURE__ */ jsxRuntimeExports.jsx(
         "button",
         {
           onClick: () => {
             soundManager.playChime("click");
-            setContactFilter(f.id);
+            setContactFilter(f2.id);
           },
-          className: `px-3 py-1 rounded-xl text-xs font-medium border shrink-0 transition-all ${contactFilter === f.id ? "bg-[#242D29] border-[#68D391] text-[#68D391] font-bold light:bg-[#F2F1EC]" : "bg-[#1B211E] border-[#384A41]/60 text-[#859A90] hover:text-[#F4F7F4] light:bg-white light:border-[#E5E3DA] light:text-[#5C655E]"}`,
-          children: f.label
+          className: `px-3 py-1 rounded-xl text-xs font-medium border shrink-0 transition-all ${contactFilter === f2.id ? "bg-[#242D29] border-[#68D391] text-[#68D391] font-bold light:bg-[#F2F1EC]" : "bg-[#1B211E] border-[#384A41]/60 text-[#859A90] hover:text-[#F4F7F4] light:bg-white light:border-[#E5E3DA] light:text-[#5C655E]"}`,
+          children: f2.label
         },
-        f.id
+        f2.id
       )) }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none", children: [
         { id: "all", label: "All Deeds" },
         { id: "kindness_other", label: "🤝 Others" },
@@ -31514,7 +31830,7 @@ const VisualAnalyticsView = () => {
     return state.readingSessions.filter((r) => r.date >= startDateStr && r.date <= today);
   }, [state.readingSessions, startDateStr, today]);
   reactExports.useMemo(() => {
-    return (state.screenTimeSessions || []).filter((s) => s.date >= startDateStr && s.date <= today);
+    return (state.screenTimeSessions || []).filter((s2) => s2.date >= startDateStr && s2.date <= today);
   }, [state.screenTimeSessions, startDateStr, today]);
   const filteredImpact = reactExports.useMemo(() => {
     return (state.impactDeeds || []).filter((i) => i.date >= startDateStr && i.date <= today);
@@ -31566,7 +31882,7 @@ const VisualAnalyticsView = () => {
       const dateStr = DateUtils.daysAgoStr(i);
       const dayWorkouts = state.workoutSessions.filter((w) => w.date === dateStr);
       const dayReading = state.readingSessions.filter((r) => r.date === dateStr);
-      const dayDigital = (state.screenTimeSessions || []).filter((s) => s.date === dateStr);
+      const dayDigital = (state.screenTimeSessions || []).filter((s2) => s2.date === dateStr);
       const dayImpact = (state.impactDeeds || []).filter((d) => d.date === dateStr);
       const dayHabits = state.ev.filter((e) => e.d === dateStr);
       const dayJournal = state.jr.find((j) => j.d === dateStr);
@@ -31631,7 +31947,7 @@ const VisualAnalyticsView = () => {
         restDaysMoodSum += j.m;
         restDaysCount++;
       }
-      const screenMinutes = (state.screenTimeSessions || []).filter((s) => s.date === j.d).reduce((acc, s) => acc + s.durationMinutes, 0);
+      const screenMinutes = (state.screenTimeSessions || []).filter((s2) => s2.date === j.d).reduce((acc, s2) => acc + s2.durationMinutes, 0);
       if (screenMinutes >= 45) {
         highScreenMoodSum += j.m;
         highScreenCount++;
@@ -32703,14 +33019,14 @@ const ProgressionLabView = () => {
           filteredTargets.length,
           " Targets Found"
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-1", children: ["active", "paused", "archived", "all"].map((s) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-1", children: ["active", "paused", "archived", "all"].map((s2) => /* @__PURE__ */ jsxRuntimeExports.jsx(
           "button",
           {
-            onClick: () => setStatusFilter(s),
-            className: `px-2 py-0.5 rounded-md text-[10px] font-bold capitalize transition-all ${statusFilter === s ? "bg-[#242D29] text-[#68D391] border border-[#384A41] light:bg-[#F2F1EC]" : "text-[#859A90] hover:text-[#F4F7F4]"}`,
-            children: s
+            onClick: () => setStatusFilter(s2),
+            className: `px-2 py-0.5 rounded-md text-[10px] font-bold capitalize transition-all ${statusFilter === s2 ? "bg-[#242D29] text-[#68D391] border border-[#384A41] light:bg-[#F2F1EC]" : "text-[#859A90] hover:text-[#F4F7F4]"}`,
+            children: s2
           },
-          s
+          s2
         )) })
       ] }),
       filteredTargets.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-8 rounded-3xl bg-[#1B211E] border border-[#384A41] text-center flex flex-col items-center gap-2 light:bg-white light:border-[#E5E3DA]", children: [
@@ -34153,7 +34469,7 @@ const VideoLibraryScreen = () => {
     let interval = null;
     if (isTimerRunning) {
       interval = setInterval(() => {
-        setTimerSeconds((s) => s + 1);
+        setTimerSeconds((s2) => s2 + 1);
       }, 1e3);
     } else {
       clearInterval(interval);
@@ -35438,12 +35754,12 @@ const SkillEditorModal = ({
                 " ",
                 pillar.isCustom ? "(Custom)" : ""
               ] }, pillar.id)) }),
-              potentialParentSkills.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("optgroup", { label: "🌱 Existing Skills (Nest as Sub-skill)", children: potentialParentSkills.map((s) => /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: s.id, children: [
+              potentialParentSkills.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("optgroup", { label: "🌱 Existing Skills (Nest as Sub-skill)", children: potentialParentSkills.map((s2) => /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: s2.id, children: [
                 "↳ ",
-                s.e,
+                s2.e,
                 " ",
-                s.n
-              ] }, s.id)) })
+                s2.n
+              ] }, s2.id)) })
             ]
           }
         )
@@ -36746,21 +37062,21 @@ function computeAnalytics(state) {
   let surfedCount = 0;
   const triggerMap = {};
   const sensationMap = {};
-  urges.forEach((u) => {
-    totalIntensity += u.preIntensity;
-    const post = u.postIntensity ?? u.preIntensity;
-    totalDrop += u.preIntensity - post;
-    if (u.outcomeStatus === "SURFED" || u.outcomeStatus === "RESISTED") {
+  urges.forEach((u2) => {
+    totalIntensity += u2.preIntensity;
+    const post = u2.postIntensity ?? u2.preIntensity;
+    totalDrop += u2.preIntensity - post;
+    if (u2.outcomeStatus === "SURFED" || u2.outcomeStatus === "RESISTED") {
       delayedCount++;
     }
-    if (u.outcomeStatus === "SURFED") {
+    if (u2.outcomeStatus === "SURFED") {
       surfedCount++;
     }
-    if (u.trigger) {
-      triggerMap[u.trigger] = (triggerMap[u.trigger] || 0) + 1;
+    if (u2.trigger) {
+      triggerMap[u2.trigger] = (triggerMap[u2.trigger] || 0) + 1;
     }
-    u.somaticSensations.forEach((s) => {
-      sensationMap[s] = (sensationMap[s] || 0) + 1;
+    u2.somaticSensations.forEach((s2) => {
+      sensationMap[s2] = (sensationMap[s2] || 0) + 1;
     });
   });
   const avgIntensity = totalUrges > 0 ? Number((totalIntensity / totalUrges).toFixed(1)) : 0;
@@ -37390,9 +37706,9 @@ const UrgeSurfingScreen = () => {
     render();
     return () => cancelAnimationFrame(animId);
   }, [secondsRemaining]);
-  const toggleSensation = (s) => {
+  const toggleSensation = (s2) => {
     setSelectedSensations(
-      (prev) => prev.includes(s) ? prev.filter((item) => item !== s) : [...prev, s]
+      (prev) => prev.includes(s2) ? prev.filter((item) => item !== s2) : [...prev, s2]
     );
   };
   const toggleContextTag = (t) => {
@@ -37424,8 +37740,8 @@ const UrgeSurfingScreen = () => {
   };
   const formatTimer = (sec) => {
     const m = Math.floor(sec / 60);
-    const s = sec % 60;
-    return `${m}:${s < 10 ? "0" : ""}${s}`;
+    const s2 = sec % 60;
+    return `${m}:${s2 < 10 ? "0" : ""}${s2}`;
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between px-1", children: [
@@ -37531,17 +37847,17 @@ const UrgeSurfingScreen = () => {
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "text-[11px] font-bold text-[#859A90] uppercase block mb-1.5", children: "Interoceptive Somatic Sensations (Where do you feel it?)" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-wrap gap-1.5", children: somaticOptions.map((s) => {
-          const active = selectedSensations.includes(s);
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-wrap gap-1.5", children: somaticOptions.map((s2) => {
+          const active = selectedSensations.includes(s2);
           return /* @__PURE__ */ jsxRuntimeExports.jsx(
             "button",
             {
               type: "button",
-              onClick: () => toggleSensation(s),
+              onClick: () => toggleSensation(s2),
               className: `px-2.5 py-1 rounded-lg text-xs font-semibold border transition-colors ${active ? "bg-[#2A5643] border-[#3D7D62] text-[#E8F3ED]" : "bg-[#242D29] border-[#384A41] text-[#859A90] light:bg-[#EFECE6] light:border-[#E5E3DA]"}`,
-              children: s
+              children: s2
             },
-            s
+            s2
           );
         }) })
       ] }),
@@ -37635,7 +37951,7 @@ const UrgeSurfingScreen = () => {
                   ] })
                 ] })
               ] }),
-              urge.somaticSensations.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-wrap gap-1", children: urge.somaticSensations.map((s) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[9px] px-1.5 py-0.2 rounded bg-[#242D29] text-[#859A90] light:bg-[#EFECE6]", children: s }, s)) })
+              urge.somaticSensations.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-wrap gap-1", children: urge.somaticSensations.map((s2) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[9px] px-1.5 py-0.2 rounded bg-[#242D29] text-[#859A90] light:bg-[#EFECE6]", children: s2 }, s2)) })
             ]
           },
           urge.id
@@ -38148,9 +38464,9 @@ const byteArrayToString = function(bytes) {
       const c2 = bytes[pos++];
       const c3 = bytes[pos++];
       const c4 = bytes[pos++];
-      const u = ((c1 & 7) << 18 | (c2 & 63) << 12 | (c3 & 63) << 6 | c4 & 63) - 65536;
-      out[c++] = String.fromCharCode(55296 + (u >> 10));
-      out[c++] = String.fromCharCode(56320 + (u & 1023));
+      const u2 = ((c1 & 7) << 18 | (c2 & 63) << 12 | (c3 & 63) << 6 | c4 & 63) - 65536;
+      out[c++] = String.fromCharCode(55296 + (u2 >> 10));
+      out[c++] = String.fromCharCode(56320 + (u2 & 1023));
     } else {
       const c2 = bytes[pos++];
       const c3 = bytes[pos++];
@@ -47098,7 +47414,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   /* @__PURE__ */ jsxRuntimeExports.jsx(React.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(App, {}) })
 );
 export {
+  Encoding as E,
   ImpactStyle as I,
   NotificationType as N,
-  WebPlugin as W
+  WebPlugin as W,
+  buildRequestInit as b
 };

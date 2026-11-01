@@ -1,4 +1,4 @@
-import { W as WebPlugin, I as ImpactStyle, N as NotificationType } from "./index-O-Fj8bEV.js";
+import { W as WebPlugin, I as ImpactStyle, N as NotificationType } from "./index-BT7oTs-z.js";
 class HapticsWeb extends WebPlugin {
   constructor() {
     super(...arguments);

@@ -73,16 +73,25 @@ jobs:
             exit 1
           fi
           
-          # Rename to clean deliverable name
+          # Copy to clean deliverable name
           cp "$APK_PATH" SelfCare-Hero-Hybrid.apk
           sha256sum SelfCare-Hero-Hybrid.apk > SelfCare-Hero-Hybrid.apk.sha256
           
           echo "APK generated successfully. Size: $(du -h SelfCare-Hero-Hybrid.apk | cut -f1)"
           echo "SHA256: $(cat SelfCare-Hero-Hybrid.apk.sha256)"
 
+      - name: Upload APK Artifact to GitHub Actions Run
+        uses: actions/upload-artifact@v4
+        with:
+          name: SelfCare-Hero-Hybrid-APK
+          path: |
+            SelfCare-Hero-Hybrid.apk
+            SelfCare-Hero-Hybrid.apk.sha256
+          retention-days: 90
+
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         with:
           tag_name: "v1.0.${{ github.run_number }}"
           name: "SelfCare Hero v1.0.${{ github.run_number }}"

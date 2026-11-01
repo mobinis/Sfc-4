@@ -77,9 +77,9 @@ const server = http.createServer((req, res) => {
       zipSize: foundZip ? fs.statSync(foundZip).size : 0,
       zipResolvedPath: foundZip || primaryZipPath,
       zipExpectedPrimaryPath: primaryZipPath,
-      repoUrl: 'https://github.com/mobinis/Self-care-and-life-changing-v3',
-      actionsUrl: 'https://github.com/mobinis/Self-care-and-life-changing-v3/actions/workflows/build-apk.yml',
-      releasesUrl: 'https://github.com/mobinis/Self-care-and-life-changing-v3/releases'
+      repoUrl: 'https://github.com/mobinis/Sfc-4',
+      actionsUrl: 'https://github.com/mobinis/Sfc-4/actions',
+      releasesUrl: 'https://github.com/mobinis/Sfc-4/releases'
     }));
     return;
   }

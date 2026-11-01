@@ -15,19 +15,23 @@ function resolveDeliverable(fileName: string): {
 } {
   const isApk = fileName.endsWith('.apk');
   const primaryBuildPath = isApk
-    ? path.resolve(__dirname, 'app/build/outputs/apk/debug/app-debug.apk')
+    ? path.resolve(__dirname, 'android/app/build/outputs/apk/debug/app-debug.apk')
     : path.resolve(__dirname, 'app/build/outputs/apk/debug/BloomQuest-Restored-Checkpoint-Android.zip');
 
   const candidates = [
     // 1. Capacitor Hybrid Android build output
     path.resolve(__dirname, 'android/app/build/outputs/apk/debug/app-debug.apk'),
-    // 2. Primary native Gradle build output
+    // 2. Hybrid APK alias at root or in downloads
+    path.resolve(__dirname, 'SelfCare-Hero-Hybrid.apk'),
+    path.resolve(__dirname, 'public/downloads/SelfCare-Hero-Hybrid.apk'),
+    // 3. Primary native Gradle build output
     primaryBuildPath,
-    // 3. Named release artifact in Gradle output directory
+    // 4. Named release artifact in Gradle output directory
+    path.resolve(__dirname, 'android/app/build/outputs/apk/debug', fileName),
     path.resolve(__dirname, 'app/build/outputs/apk/debug', fileName),
-    // 4. Public downloads directory
+    // 5. Public downloads directory
     path.resolve(__dirname, 'public/downloads', fileName),
-    // 5. Root workspace fallback
+    // 6. Root workspace fallback
     path.resolve(__dirname, fileName)
   ];
 
@@ -114,12 +118,13 @@ export default defineConfig({
 
           // 1. Deliverable Status API with diagnostic path verification logging
           if (cleanUrl === '/api/apk-status') {
-            const apkResolution = resolveDeliverable('BloomQuest-Restored-Checkpoint.apk');
+            const hybridApkRes = resolveDeliverable('SelfCare-Hero-Hybrid.apk');
+            const legacyApkRes = resolveDeliverable('BloomQuest-Restored-Checkpoint.apk');
+            const apkResolution = hybridApkRes.exists ? hybridApkRes : legacyApkRes;
             const zipResolution = resolveDeliverable('BloomQuest-Restored-Checkpoint-Android.zip');
 
             console.log('[Deliverable Middleware: /api/apk-status]');
             console.log(`  APK Primary Path: ${apkResolution.expectedPrimaryPath} (Exists: ${apkResolution.exists}, Size: ${apkResolution.fileSize} bytes)`);
-            console.log(`  ZIP Primary Path: ${zipResolution.expectedPrimaryPath} (Exists: ${zipResolution.exists}, Size: ${zipResolution.fileSize} bytes)`);
 
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({
@@ -135,24 +140,19 @@ export default defineConfig({
                 apk: apkResolution.candidatePaths,
                 zip: zipResolution.candidatePaths
               },
-              repoUrl: 'https://github.com/mobinis/Self-care-and-life-changing-v3',
-              actionsUrl: 'https://github.com/mobinis/Self-care-and-life-changing-v3/actions/workflows/build-apk.yml',
-              releasesUrl: 'https://github.com/mobinis/Self-care-and-life-changing-v3/releases'
+              repoUrl: 'https://github.com/mobinis/Sfc-4',
+              actionsUrl: 'https://github.com/mobinis/Sfc-4/actions',
+              releasesUrl: 'https://github.com/mobinis/Sfc-4/releases'
             }));
             return;
           }
 
-          // 2. APK Download Endpoint with Absolute Path Resolution & Specific Fallback Message
-          if (cleanUrl === '/downloads/BloomQuest-Restored-Checkpoint.apk') {
-            const fileName = 'BloomQuest-Restored-Checkpoint.apk';
+          // 2. APK Download Endpoints (both SelfCare-Hero-Hybrid.apk and BloomQuest-Restored-Checkpoint.apk)
+          if (cleanUrl === '/downloads/SelfCare-Hero-Hybrid.apk' || cleanUrl === '/downloads/BloomQuest-Restored-Checkpoint.apk' || cleanUrl === '/downloads/app-debug.apk') {
+            const fileName = cleanUrl.endsWith('SelfCare-Hero-Hybrid.apk')
+              ? 'SelfCare-Hero-Hybrid.apk'
+              : 'BloomQuest-Restored-Checkpoint.apk';
             const resolution = resolveDeliverable(fileName);
-
-            console.log(`[Deliverable Middleware: Download APK]`);
-            console.log(`  Target File: ${fileName}`);
-            console.log(`  Expected Primary Path: ${resolution.expectedPrimaryPath}`);
-            console.log(`  Resolved Path: ${resolution.resolvedPath}`);
-            console.log(`  File Exists on Disk: ${resolution.exists}`);
-            console.log(`  Evaluated Candidate Paths:\n${resolution.candidatePaths.map(c => `    - ${c.path} [${c.exists ? 'FOUND' : 'NOT FOUND'}]`).join('\n')}`);
 
             if (resolution.exists) {
               res.writeHead(200, {
@@ -166,8 +166,6 @@ export default defineConfig({
               const expectedDir = path.dirname(resolution.expectedPrimaryPath);
               const dirExists = fs.existsSync(expectedDir);
 
-              console.warn(`[Deliverable Middleware: 404 Missing APK] File not found at expected path: ${resolution.expectedPrimaryPath}`);
-
               res.writeHead(404, { 'Content-Type': 'application/json' });
               res.end(JSON.stringify({
                 status: 'error',
@@ -177,8 +175,8 @@ export default defineConfig({
                 expectedDirectory: expectedDir,
                 directoryExistsOnDisk: dirExists,
                 evaluatedCandidatePaths: resolution.candidatePaths,
-                resolutionGuidance: 'The 96 MB native Android APK is generated by GitHub Actions (.github/workflows/build-apk.yml) or locally via ./gradlew assembleDebug. Once compiled, the APK must be located at the expectedAbsolutePath indicated above.',
-                ciWorkflowUrl: 'https://github.com/mobinis/Self-care-and-life-changing-v3/actions/workflows/build-apk.yml'
+                resolutionGuidance: 'The Android APK is compiled automatically by GitHub Actions (.github/workflows/build-apk.yml) or locally via ./gradlew assembleDebug.',
+                ciWorkflowUrl: 'https://github.com/mobinis/Sfc-4/actions'
               }, null, 2));
               return;
             }
