@@ -11,8 +11,12 @@ import {
   FileArchive,
   Smartphone,
   LogOut,
-  Info
+  Info,
+  Sparkles,
+  FolderArchive,
+  Lock
 } from 'lucide-react';
+import { usePWAInstall } from '../pwa/usePWAInstall';
 import { User } from 'firebase/auth';
 import {
   auth,
@@ -31,6 +35,7 @@ interface ApkExportModalProps {
 }
 
 export const ApkExportModal: React.FC<ApkExportModalProps> = ({ isOpen, onClose }) => {
+  const { isInstallable, isInstalled, install } = usePWAInstall();
   const [currentUser, setCurrentUser] = useState<User | null>(auth.currentUser);
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
@@ -245,14 +250,86 @@ export const ApkExportModal: React.FC<ApkExportModalProps> = ({ isOpen, onClose 
 
         {/* Scrollable Body */}
         <div className="overflow-y-auto py-4 space-y-4 pr-1">
-          {/* Explanation Banner */}
-          <div className="p-3.5 rounded-2xl bg-[#242D29] border border-[#384A41] text-xs text-[#859A90] flex items-start gap-3">
-            <Info className="w-5 h-5 text-[#E5A93C] shrink-0 mt-0.5" />
-            <div className="space-y-1">
-              <span className="font-bold text-[#F4F7F4]">How BloomQuest APK Delivery Works</span>
-              <p>
-                BloomQuest is a full native Android app (Jetpack Compose, Room DB, ONNX). Large compiled APK binaries (96 MB) are built and distributed directly via your repository's automated GitHub Actions pipeline.
-              </p>
+          {/* TOP RECOMMENDED WORKAROUND: Direct Native PWA Install */}
+          <div className="p-4 rounded-2xl bg-[#1D2B20] border-2 border-[#87A96B] space-y-3 shadow-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-[#87A96B]" />
+                <h3 className="text-xs font-black uppercase tracking-wider text-[#87A96B]">
+                  Top Workaround: Install App on this Phone
+                </h3>
+              </div>
+              <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-[#87A96B] text-[#1E241B]">
+                100% Reliable
+              </span>
+            </div>
+
+            <p className="text-xs text-[#E8F3ED] leading-relaxed">
+              No APK download, GitHub login, or file permissions needed! Install SelfCare Hero directly onto your Android device as a standalone app right now.
+            </p>
+
+            {isInstalled ? (
+              <div className="p-3 rounded-xl bg-[#25392A] border border-[#87A96B]/50 flex items-center gap-2.5 text-xs text-[#87A96B] font-bold">
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <span>SelfCare Hero is already installed as a standalone app on this device!</span>
+              </div>
+            ) : (
+              <div className="space-y-2.5">
+                {isInstallable && (
+                  <button
+                    onClick={install}
+                    className="w-full py-3 px-4 rounded-xl bg-[#87A96B] hover:bg-[#76985B] active:scale-98 text-[#1E241B] font-black text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
+                  >
+                    <Smartphone className="w-4 h-4" />
+                    <span>📲 Install SelfCare Hero (1-Tap)</span>
+                  </button>
+                )}
+
+                <div className="p-3 rounded-xl bg-[#121A14] border border-[#2D4532] text-[11px] text-[#A2B8A8] space-y-1.5">
+                  <span className="font-bold text-[#F4F7F4] block flex items-center gap-1.5">
+                    <span>How to install in Google Chrome on Android:</span>
+                  </span>
+                  <ol className="list-decimal list-inside space-y-1 text-[#E8F3ED]">
+                    <li>Tap the <strong>three dots menu (⋮)</strong> in the top right corner of Chrome.</li>
+                    <li>Tap <strong>&quot;Install app&quot;</strong> (or <strong>&quot;Add to Home screen&quot;</strong>).</li>
+                    <li>Tap <strong>Install</strong>.</li>
+                  </ol>
+                  <p className="text-[10px] text-[#87A96B] pt-0.5 font-medium">
+                    ✓ Full screen (no browser address bar) • Works offline • Independent app icon
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* WORKAROUND 2: Extract 54 MB ZIP already on phone */}
+          <div className="p-3.5 rounded-2xl bg-[#242D29] border border-[#E5A93C]/40 space-y-2 text-xs">
+            <div className="flex items-center gap-2 text-[#E5A93C] font-bold">
+              <FolderArchive className="w-4 h-4 shrink-0" />
+              <span>Workaround 2: Extract Your Existing 54 MB ZIP</span>
+            </div>
+            <p className="text-[11px] text-[#C5D1C9] leading-relaxed">
+              In your phone&apos;s <strong>Downloads</strong> folder, you already downloaded <strong className="text-[#F4F7F4]">BloomQuest-v1.0.7-debug.zip (54.01 MB)</strong>!
+            </p>
+            <div className="p-2.5 rounded-xl bg-[#1B211E] border border-[#384A41] text-[11px] text-[#859A90] space-y-1">
+              <p className="text-[#E8F3ED]">1. Open Samsung <strong>My Files</strong> → <strong>Downloads</strong>.</p>
+              <p className="text-[#E8F3ED]">2. Tap <strong>BloomQuest-v1.0.7-debug.zip</strong> and tap <strong>Extract</strong>.</p>
+              <p className="text-[#E8F3ED]">3. Inside is the compiled <strong className="text-[#87A96B]">.apk</strong> ready to install immediately!</p>
+            </div>
+          </div>
+
+          {/* WORKAROUND 3: GitHub 404 Troubleshooting */}
+          <div className="p-3.5 rounded-2xl bg-[#242D29] border border-[#384A41] space-y-2 text-xs">
+            <div className="flex items-center gap-2 text-[#859A90] font-bold">
+              <Lock className="w-4 h-4 text-[#859A90] shrink-0" />
+              <span>Workaround 3: Fix GitHub 404 Error (Private Repository)</span>
+            </div>
+            <p className="text-[11px] text-[#859A90] leading-relaxed">
+              Why did <code className="text-[#E5A93C]">github.com/mobinis/Sfc-4</code> show a 404 page? Because the repo is <strong className="text-[#F4F7F4]">Private</strong> and your mobile browser isn&apos;t signed in to GitHub.
+            </p>
+            <div className="p-2.5 rounded-xl bg-[#1B211E] border border-[#384A41] text-[11px] text-[#859A90] space-y-1">
+              <p>• <strong>Make repo Public:</strong> Go to repo Settings → Danger Zone → Change visibility → Make Public.</p>
+              <p>• <strong>Or Sign In on Phone:</strong> Open <a href="https://github.com/login" target="_blank" rel="noopener noreferrer" className="text-[#87A96B] underline font-bold">github.com/login</a> in your mobile browser first.</p>
             </div>
           </div>
 
